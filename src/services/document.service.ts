@@ -19,3 +19,16 @@ export const saveDocumentMetadata = async (
 
   return document;
 };
+
+export const getWorkspaceDocuments = async (
+  workspaceId: string,
+  userNid: string
+) => {
+  const documents = await DocumentModel.find({
+    workspaceId,
+    userNid,
+    isDeleted: false,
+  });
+
+  return documents;
+};
