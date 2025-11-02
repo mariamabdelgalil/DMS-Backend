@@ -26,4 +26,7 @@ const documentSchema = new Schema<IDocument>({
   isDeleted: { type: Boolean, default: false },
 });
 
+documentSchema.index({ name: 1 });
+documentSchema.index({ type: 1 });
+
 export default mongoose.model<IDocument>("Document", documentSchema);

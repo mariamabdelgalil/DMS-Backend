@@ -1,10 +1,14 @@
 import express from "express";
 import { upload } from "../middleware/upload.middleware";
 import { authMiddleware } from "../middleware/auth.middleware";
-import { uploadDocumentHandler } from "../controllers/document.controller";
 import {
+  uploadDocumentHandler,
   getWorkspaceDocumentsHandler,
   softDeleteDocument,
+  searchDocuments,
+  downloadDocumentHandler,
+  updateDocumentMetadata,
+  getDocumentMetadata,
 } from "../controllers/document.controller";
 
 const router = express.Router();
@@ -26,5 +30,17 @@ router.get(
   authMiddleware,
   getWorkspaceDocumentsHandler
 );
+
+// api/documents/search
+router.get("/search", authMiddleware, searchDocuments);
+
+// api/documents/:id/download
+router.get("/:id/download", authMiddleware, downloadDocumentHandler);
+
+//GET api/documents/:id/metadata
+router.get("/:id/metadata", authMiddleware, getDocumentMetadata);
+
+//PUT api/documents/:id/metadata
+router.put("/:id/metadata", authMiddleware, updateDocumentMetadata);
 
 export default router;
