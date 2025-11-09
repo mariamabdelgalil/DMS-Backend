@@ -24,7 +24,9 @@ export const registerUser = async (
     data: { name, email, password: hashedPassword, nid },
   });
 
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ userNid: user.nid }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   return { user, token };
 };
@@ -36,7 +38,9 @@ export const loginUser = async (email: string, password: string) => {
   const isValid = await bcrypt.compare(password, user.password);
   if (!isValid) throw new Error("Invalid credentials");
 
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ userNid: user.nid }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   return { user, token };
 };
