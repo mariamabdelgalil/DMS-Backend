@@ -77,3 +77,7 @@ export const deleteWorkspaceHandler = async (
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+export const test = async (req: AuthRequest, res: Response) => {
+  res.status(200).json({ message: "Test ws" });
+};

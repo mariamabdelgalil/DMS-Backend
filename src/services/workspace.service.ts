@@ -1,4 +1,7 @@
 import Workspace from "../models/workspace.model";
+import DocumentModel from "../models/document.model";
+import fs from "fs";
+import path from "path";
 
 // create
 export const createWorkspace = async (name: string, userNid: string) => {
@@ -24,11 +27,50 @@ export const updateWorkspace = async (
 };
 
 // delete
+// export const deleteWorkspace = async (
+//   id: string,
+//   userNid: string | undefined
+// ) => {
+//   const workspace = await Workspace.findOne({ _id: id, userNid });
+//   if (!workspace) throw new Error("Workspace not found or not authorized");
+//   await Workspace.findByIdAndDelete(id);
+
+//   //cascade delete documents
+//   await DocumentModel.deleteMany({
+//     workspaceId: id,
+//     userNid,
+//   });
+
+//   return { success: true };
+// };
+
 export const deleteWorkspace = async (
   id: string,
   userNid: string | undefined
 ) => {
   const workspace = await Workspace.findOne({ _id: id, userNid });
   if (!workspace) throw new Error("Workspace not found or not authorized");
-  return await Workspace.findByIdAndDelete(id);
+
+  // Get all documents before deletion to remove files
+  const documents = await DocumentModel.find({ workspaceId: id, userNid });
+
+  // Delete workspace from DB
+  await Workspace.findByIdAndDelete(id);
+
+  // Delete all documents from DB
+  await DocumentModel.deleteMany({ workspaceId: id, userNid });
+
+  // Delete files physically from storage
+  documents.forEach((doc) => {
+    if (doc.filePath) {
+      try {
+        const filePath = path.resolve(doc.filePath);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      } catch (err) {
+        console.error("Error deleting file:", err);
+      }
+    }
+  });
+
+  return { success: true, message: "Workspace and all its documents deleted" };
 };

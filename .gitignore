@@ -3,4 +3,5 @@ node_modules
 .env
 # Ignore uploaded files
 uploads/
-
+#ignore dist folder
+dist/
