@@ -108,7 +108,24 @@ export const searchDocuments = async (req: AuthRequest, res: Response) => {
         .json({ message: "workspaceId and query are required" });
 
     const documents = await searchDocumentsService(workspaceId, query);
-    res.status(200).json(documents);
+
+    const documentsWithThumbnails = await Promise.all(
+      documents.map(async (doc) => {
+        const docObj = doc.toObject() as Record<string, any>;
+
+        docObj.thumbnailBase64 = doc.thumbnailPath
+          ? await convertToBase64(doc.thumbnailPath)
+          : null;
+
+        return docObj;
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      count: documentsWithThumbnails.length,
+      documents: documentsWithThumbnails,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -151,6 +168,7 @@ export const viewDocumentHandler = async (req: AuthRequest, res: Response) => {
   }
 };
 
+//old
 export const previewDocumentHandler = async (
   req: AuthRequest,
   res: Response
@@ -235,15 +253,9 @@ export const getWorkspaceDocumentsHandler = async (
       filters
     );
 
-    // res.status(200).json({
-    //   success: true,
-    //   count: documents.length,
-    //   documents,
-    // });
-
     const documentsWithThumbnails = await Promise.all(
       documents.map(async (doc) => {
-        const docObj = doc.toObject() as Record<string, any>; // ✅ allow adding custom fields
+        const docObj = doc.toObject() as Record<string, any>;
 
         docObj.thumbnailBase64 = doc.thumbnailPath
           ? await convertToBase64(doc.thumbnailPath)
