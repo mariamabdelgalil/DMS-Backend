@@ -14,6 +14,8 @@ import {
   saveDocumentMetadataService,
   getWorkspaceDocumentsService,
 } from "../services/document.service";
+import { generateThumbnail } from "../utils/generateThumbnail";
+import { convertToBase64 } from "../utils/convertToBase64";
 import fs from "fs";
 
 export const softDeleteDocument = async (req: AuthRequest, res: Response) => {
@@ -106,7 +108,24 @@ export const searchDocuments = async (req: AuthRequest, res: Response) => {
         .json({ message: "workspaceId and query are required" });
 
     const documents = await searchDocumentsService(workspaceId, query);
-    res.status(200).json(documents);
+
+    const documentsWithThumbnails = await Promise.all(
+      documents.map(async (doc) => {
+        const docObj = doc.toObject() as Record<string, any>;
+
+        docObj.thumbnailBase64 = doc.thumbnailPath
+          ? await convertToBase64(doc.thumbnailPath)
+          : null;
+
+        return docObj;
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      count: documentsWithThumbnails.length,
+      documents: documentsWithThumbnails,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -149,6 +168,7 @@ export const viewDocumentHandler = async (req: AuthRequest, res: Response) => {
   }
 };
 
+//old
 export const previewDocumentHandler = async (
   req: AuthRequest,
   res: Response
@@ -193,6 +213,16 @@ export const uploadDocumentHandler = async (
       req.file.size
     );
 
+    const thumbnailPath = await generateThumbnail(
+      req.file.path,
+      document._id.toString(),
+      req.file.mimetype
+    );
+    if (thumbnailPath) {
+      document.thumbnailPath = thumbnailPath;
+      await document.save();
+    }
+
     res.status(201).json({ success: true, document });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -223,10 +253,22 @@ export const getWorkspaceDocumentsHandler = async (
       filters
     );
 
+    const documentsWithThumbnails = await Promise.all(
+      documents.map(async (doc) => {
+        const docObj = doc.toObject() as Record<string, any>;
+
+        docObj.thumbnailBase64 = doc.thumbnailPath
+          ? await convertToBase64(doc.thumbnailPath)
+          : null;
+
+        return docObj;
+      })
+    );
+
     res.status(200).json({
       success: true,
-      count: documents.length,
-      documents,
+      count: documentsWithThumbnails.length,
+      documents: documentsWithThumbnails,
     });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });

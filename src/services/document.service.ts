@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import DocumentModel from "../models/document.model";
+import { IDocument } from "../models/document.model";
 
 export const softDeleteDocumentService = async (
   id: string,
@@ -40,6 +41,10 @@ export const permanentlyDeleteDocumentService = async (
 
   const filePath = path.resolve(document.filePath);
   if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+  if (document.thumbnailPath && fs.existsSync(document.thumbnailPath)) {
+    fs.unlinkSync(document.thumbnailPath);
+  }
 
   await DocumentModel.deleteOne({ _id: id });
   return true;

@@ -3,5 +3,7 @@ node_modules
 .env
 # Ignore uploaded files
 uploads/
+#ignore thumbnails
+thumbnails/
 #ignore dist folder
 dist/
