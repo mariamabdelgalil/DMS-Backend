@@ -28,10 +28,42 @@ This backend powers the frontend built with React.
 
 ---
 
-## Authentication
 
-- JSON Web Tokens (JWT)  
-- Protected routes with auth middleware
+---
 
+## Document Management Features
 
+###  File Upload (multer + Sharp)
+- Users upload documents (PDF, images, word, etc.)
+- If the file is an **image**, Sharp compresses it  
+- The system generates:  
+  - **Original file**  
+  - **Thumbnail preview (Base64)**
+
+###  File Preview (Base64)
+- For image documents → Base64 preview string is generated 
+- Allows instant preview in frontend without extra requests  
+- Improves UI performance  
+
+###  File Download
+- Secure REST endpoint to download files by ID  
+- Token verification keeps private documents protected  
+
+###  Soft Delete (Move to Recycle Bin)
+- Document is marked as `isDeleted = true`
+- Removed from workspace view but recoverable  
+
+###  Permanent Delete
+- File removed permanently from storage  
+- Document removed from MongoDB  
+
+---
+
+## 🔐 Authentication Flow
+
+- User logs in/registers → backend validates → returns **JWT + user info**  
+- Redux stores auth data  
+- Redux Persist saves it into **localStorage**  
+- Protected routes check JWT validity  
+- Middleware checks token before accessing sensitive operations
 
