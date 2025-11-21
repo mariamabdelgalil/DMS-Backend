@@ -31,8 +31,7 @@ This backend powers the frontend built with React.
 ## Authentication
 
 - JSON Web Tokens (JWT)  
-- Protected routes with auth middleware  
-- Access tokens validated through AuthMiddleware
+- Protected routes with auth middleware
 
 
 
