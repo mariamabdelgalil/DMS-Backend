@@ -43,7 +43,7 @@ router.get("/:id/view", authMiddleware, viewDocumentHandler);
 //GET api/documents/:id/preview
 router.get("/:id/preview", authMiddleware, previewDocumentHandler);
 
-router.get("/test", test);
+router.get("/test/test", test);
 
 // api/documents/:id/restore
 router.put("/:id/restore", authMiddleware, restoreDocument);

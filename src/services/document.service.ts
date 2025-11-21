@@ -1,4 +1,5 @@
 import fs from "fs";
+import { promises as fsPromises } from "fs";
 import path from "path";
 import sharp from "sharp";
 import DocumentModel from "../models/document.model";

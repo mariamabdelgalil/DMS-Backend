@@ -153,6 +153,7 @@ export const downloadDocumentHandler = async (
 
 export const viewDocumentHandler = async (req: AuthRequest, res: Response) => {
   try {
+    // console.log("req rec");
     const { document, base64String } = await viewDocumentService(
       req.params.id,
       req.user?.userNid!
@@ -188,6 +189,7 @@ export const uploadDocumentHandler = async (
   req: AuthRequest,
   res: Response
 ) => {
+  console.log("upload req rec");
   try {
     if (!req.file) {
       return res
